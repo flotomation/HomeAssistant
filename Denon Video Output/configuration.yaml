@@ -1,0 +1,41 @@
+python_script:
+
+input_select:
+  denon_outputs:
+    name: Denon Video Output
+    options:
+      - "TV"
+      - "Beamer"
+      - "Auto"
+
+
+ sensors:
+  - platform: rest
+    name: Denon Video Output
+    scan_interval: 15
+    resource: 'http://DENONIP:8080/goform/AppCommand0300.xml'
+    payload:  "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<tx>\n  <cmd id=\"3\">\n    <name>GetOutputSettings</name>\n    <list>\n      <param name=\"videoout\"></param>\n    </list>\n  </cmd>\n</tx>"
+    method: POST
+    unique_id: denon_video_output  
+    headers:
+      Content-Type: 'text/plain'
+    json_attributes_path: "$.rx.cmd.list.param"
+    json_attributes:
+        - "@name"
+        - "#text"
+    value_template: "OK"
+
+
+  - platform: template
+      denon_video_output_string:
+        availability_template: "{{ state_attr('sensor.denon_video_output','#text') != None }}"
+        friendly_name: "Denon Video Output"
+        value_template: >-
+          {% if is_state_attr("sensor.denon_video_output", "#text", "1") %}
+          TV
+          {% elif is_state_attr("sensor.denon_video_output", "#text", "2") %}
+          Beamer
+          {% elif is_state_attr("sensor.denon_video_output", "#text", "3") %}
+          AUTO  
+          {% endif %}
+        unique_id: denon_video_output_string   

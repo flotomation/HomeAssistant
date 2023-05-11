@@ -1,0 +1,94 @@
+- alias: Update Denon Output Select
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.denon_video_output_string
+    to: TV
+    id: TV
+  - platform: state
+    entity_id:
+    - sensor.denon_video_output_string
+    to: Beamer
+    id: Beamer
+  - platform: state
+    entity_id:
+    - sensor.denon_video_output_string
+    to: AUTO
+    id: Auto
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: TV
+      sequence:
+      - service: python_script.set_state
+        data:
+          entity_id: input_select.denon_output
+          state: TV
+    - conditions:
+      - condition: trigger
+        id: Beamer
+      sequence:
+      - service: python_script.set_state
+        data:
+          entity_id: input_select.denon_output
+          state: Beamer
+    - conditions:
+      - condition: trigger
+        id: Auto
+      sequence:
+      - service: python_script.set_state
+        data:
+          entity_id: input_select.denon_output
+          state: Auto
+  mode: single
+- alias: Denon Output Select Event
+  description: ''
+  trigger:
+  - platform: event
+    event_type: call_service
+    event_data:
+      domain: input_select
+      service: select_option
+  condition:
+  - condition: template
+    value_template: '{{trigger.event.as_dict()[''data''][''service_data''][''entity_id'']
+      == ''input_select.denon_output''}}'
+  - condition: state
+    entity_id: media_player.denon_avr
+    state: 'on'
+  action:
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: '{{trigger.event.as_dict()[''data''][''service_data''][''option'']
+          == ''TV''}}'
+      sequence:
+      - service: denonavr.get_command
+        data:
+          command: /goform/formiPhoneAppDirect.xml?VSMONI1
+        target:
+          entity_id: media_player.denon_avr
+    - conditions:
+      - condition: template
+        value_template: '{{trigger.event.as_dict()[''data''][''service_data''][''option'']
+          == ''Beamer''}}'
+      sequence:
+      - service: denonavr.get_command
+        data:
+          command: /goform/formiPhoneAppDirect.xml?VSMONI2
+        target:
+          entity_id: media_player.denon_avr
+    - conditions:
+      - condition: template
+        value_template: '{{trigger.event.as_dict()[''data''][''service_data''][''option'']
+          == ''Auto''}}'
+      sequence:
+      - service: denonavr.get_command
+        data:
+          command: /goform/formiPhoneAppDirect.xml?VSMONIAUTO
+        target:
+          entity_id: media_player.denon_avr
+  mode: single
