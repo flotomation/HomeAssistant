@@ -1,7 +1,6 @@
 The local Cache on macOS is needed: ~/Library/Caches/com.apple.findmy.fmipcore/Items.data
 
 Mac OS GUI APP FindMySync uses HA rest API to generate device_tracker entities:
-
 https://github.com/MartinPham/FindMySync
 
 Python Script and MQTT:
@@ -13,3 +12,9 @@ https://github.com/ndbroadbent/mac_airtag_to_mqtt
 
 Run Mac OS (for testing) in KVM via Docker:
 https://github.com/sickcodes/Docker-OSX
+
+Notes for Docker:
+Additional install requirements docker and podman
+edit /etc/containers/registries.conf and add line: unqualified-search-registries = ["docker.io"]
+
+For macOS Ventura erase disk with option HFS+ Journaled NOT APFS! You will run into errors
