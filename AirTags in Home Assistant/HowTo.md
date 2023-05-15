@@ -28,3 +28,8 @@ sudo modprobe kvm
 
 
 For macOS Ventura erase disk with option HFS+ Journaled NOT APFS! You will run into errors
+
+
+
+More on AirTags in Home Assistant:
+https://community.home-assistant.io/t/is-there-any-way-to-track-apple-airtags-via-home-assistant/389049/32
