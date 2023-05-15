@@ -17,4 +17,14 @@ Notes for Docker:
 Additional install requirements docker and podman
 edit /etc/containers/registries.conf and add line: unqualified-search-registries = ["docker.io"]
 
+run
+sudo systemctl enable --now libvirtd
+
+sudo systemctl enable --now virtlogd
+
+echo 1 | sudo tee /sys/module/kvm/parameters/ignore_msrs
+
+sudo modprobe kvm
+
+
 For macOS Ventura erase disk with option HFS+ Journaled NOT APFS! You will run into errors
