@@ -1,0 +1,270 @@
+esphome:
+  name: cookerhood
+
+esp8266:
+  board: d1_mini
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !key
+  reboot_timeout: 0s
+  
+ota:
+  password: !otapwd
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+
+captive_portal:
+    
+web_server:
+    port: 80
+  
+  
+binary_sensor:
+
+
+  - platform: gpio
+    id: button_1
+    pin: 
+      number: D1
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "S1"
+
+    filters:
+      - delayed_on: 5ms
+      - delayed_off: 5ms
+    on_click:
+      then:
+        - switch.toggle: stufe1
+
+
+  - platform: gpio
+    id: button_2_2
+    pin: 
+      number: D2
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "S2_neu"
+
+
+  - platform: gpio
+    id: button_3
+    pin: 
+      number: D3
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "S3"
+    filters:
+      - delayed_on: 5ms
+      - delayed_off: 5ms
+    on_click:
+      then:
+        - switch.toggle: stufe3
+
+
+  - platform: gpio
+    id: button_4
+    pin: 
+      number: D4
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "S4"
+
+    filters:
+      - delayed_on: 5ms
+      - delayed_off: 5ms
+    on_click:
+      then:
+        - switch.toggle: licht
+  
+   
+switch:
+  - platform: gpio
+    name: "S1_Druck"
+    id: relay1
+    restore_mode: always off    
+    pin: 
+     number: "D5"
+     inverted: yes
+    interlock: [relay2,relay3]
+    on_turn_on:
+    - delay: 500ms
+    - switch.turn_off: relay1
+
+  - platform: gpio
+    name: "S2_Druck"
+    id: relay2
+    interlock: [relay1,relay3]
+    restore_mode: always off    
+    pin: 
+     number: "D6"
+     inverted: yes
+    on_turn_on:
+    - delay: 500ms
+    - switch.turn_off: relay2
+
+  - platform: gpio
+    name: "S3_Druck"
+    id: relay3
+    restore_mode: always off    
+    interlock: [relay1,relay2]
+    pin: 
+     number: "D7"
+     inverted: yes
+    on_turn_on:
+    - delay: 500ms
+    - switch.turn_off: relay3
+
+
+  - platform: gpio
+    name: "S4_Druck"
+    id: relay4
+    restore_mode: always off    
+    pin: 
+     number: "D8"
+     inverted: yes
+    on_turn_on:
+    - delay: 600ms
+    - switch.turn_off: relay4
+
+ 
+   
+  - platform: template
+    name: "Licht"
+    id: licht
+    optimistic: true    
+    on_turn_off:
+      then:
+        - if:
+            condition:
+             switch.is_off: licht
+            then:
+              - switch.turn_on: relay4
+            else:
+              - logger.log: "Licht ist schon aus"
+    on_turn_on:
+      then:
+        - if:
+            condition:
+             switch.is_on: licht
+            then:
+               - switch.turn_on: relay4
+            else:
+              - logger.log: "Licht ist schon an"
+
+
+
+  - platform: template
+    name: "Stufe 1"
+    id: stufe1
+    turn_on_action:
+      - switch.turn_on: relay1
+      - switch.toggle: stufe1_betrieb
+    turn_off_action:
+      - switch.turn_on: relay1
+      - switch.toggle: stufe1_betrieb
+    optimistic: true    
+
+
+
+  - platform: template
+    name: "Stufe 2"
+    id: stufe2
+    turn_on_action:
+      - switch.turn_on: relay2
+      - switch.toggle: stufe2_betrieb
+    turn_off_action:
+      - switch.turn_on: relay2
+      - switch.toggle: stufe2_betrieb
+    optimistic: true   
+
+    
+  - platform: template
+    name: "Stufe 3"
+    id: stufe3
+    turn_on_action:
+      - switch.turn_on: relay3
+      - switch.toggle: stufe3_betrieb
+    turn_off_action:
+      - switch.turn_on: relay3
+      - switch.toggle: stufe3_betrieb
+    optimistic: true
+
+   
+  - platform: template
+    id: stufe1_betrieb
+    name: Stufe 1 Betrieb
+    turn_on_action: 
+      - switch.turn_off: stufe2_betrieb
+      - switch.turn_off: stufe3_betrieb
+      - switch.turn_on: haube_in_betrieb 
+    optimistic: true
+    on_turn_off:
+      then:
+        - if:
+            condition:
+              and:
+               - switch.is_off: stufe1_betrieb
+               - switch.is_off: stufe2_betrieb
+               - switch.is_off: stufe3_betrieb
+            then:
+              - switch.turn_off: haube_in_betrieb 
+            else:
+              - logger.log: "Aus"
+
+  - platform: template
+    id: stufe2_betrieb
+    name: Stufe 2 Betrieb
+    turn_on_action: 
+      - switch.turn_off: stufe1_betrieb
+      - switch.turn_off: stufe3_betrieb  
+      - switch.turn_on: haube_in_betrieb 
+    optimistic: true
+    on_turn_off:
+      then:
+        - if:
+            condition:
+              and:
+               - switch.is_off: stufe1_betrieb
+               - switch.is_off: stufe2_betrieb
+               - switch.is_off: stufe3_betrieb
+            then:
+              - switch.turn_off: haube_in_betrieb 
+            else:
+              - logger.log: "Aus"
+
+  - platform: template
+    id: stufe3_betrieb
+    name: Stufe 3 Betrieb       
+    turn_on_action: 
+      - switch.turn_off: stufe1_betrieb
+      - switch.turn_off: stufe2_betrieb
+      - switch.turn_on: haube_in_betrieb 
+    optimistic: true   
+    on_turn_off:
+      then:
+        - if:
+            condition:
+              and:
+               - switch.is_off: stufe1_betrieb
+               - switch.is_off: stufe2_betrieb
+               - switch.is_off: stufe3_betrieb
+            then:
+              - switch.turn_off: haube_in_betrieb 
+            else:
+              - logger.log: "Aus"
+
+
+    
+  - platform: template
+    name: Haube in Betrieb
+    id: haube_in_betrieb 
+    optimistic: true   
