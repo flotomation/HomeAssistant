@@ -10,11 +10,11 @@ logger:
 # Enable Home Assistant API
 api:
   encryption:
-    key: !key
+    key: !secret key
   reboot_timeout: 0s
   
 ota:
-  password: !otapwd
+  password: !secret otapwd
 
 wifi:
   ssid: !secret wifi_ssid
