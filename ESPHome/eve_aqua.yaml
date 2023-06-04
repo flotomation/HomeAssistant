@@ -1,0 +1,99 @@
+
+esphome:
+  name: eve_aqua
+
+
+esp32:
+  board: esp32dev
+  framework:
+    type: esp-idf
+
+
+wifi:
+  ssid: 
+  password: 
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "th0rVrmUT7d4aQ/+fha2ulZKXJ9PJLyVF/qGt3tjGkU="
+  reboot_timeout: 0s
+ota:
+  password: 'homeassistant'
+  on_begin: 
+        then:
+        - lambda: |-
+            id(ble_tracker).stop_scan();
+bluetooth_proxy:
+  active: true  
+esp32_ble_tracker:
+  id: ble_tracker
+
+switch:
+  - platform: gpio
+    id: relay
+    internal: true
+    name: "Relay"
+    pin: 
+     number: 2
+    restore_mode: always off  
+
+  - platform: template
+    name: "Eve Aqua"
+    icon: "mdi:sprinkler"
+    id: eve_aqua
+    restore_mode: always off  
+    lambda: |-
+      if (id(ventil).state) {
+        return true;
+      } else {
+        return false;
+      }
+    turn_on_action:
+      - switch.toggle: relay
+      - delay: 120s
+      - switch.toggle: relay
+      - homeassistant.service:
+          service: timer.start
+          data:
+              entity_id: timer.eve_aqua
+
+    turn_off_action:
+     - switch.toggle: relay
+     - homeassistant.service:
+        service: timer.cancel
+        data:
+            entity_id: timer.eve_aqua
+
+binary_sensor:
+
+  - platform: gpio
+    id: ventil
+    icon: mdi:pipe-valve
+    pin: 
+      number: 27
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "Ventil"
+    device_class: opening
+    on_state:
+      then:
+        - switch.toggle: relay
+
+  - platform: gpio
+    id: button
+    pin: 
+      number: 33
+      mode: INPUT_PULLUP
+      inverted: true
+  
+    name: "Button"
+    on_click:
+      min_length: 50ms
+      max_length: 350ms
+      then:
+        - switch.toggle: eve_aqua
+
