@@ -1,0 +1,62 @@
+alias: Post im Briefkasten
+description: ""
+trigger:
+  - platform: state
+    entity_id: binary_sensor.openclose_42
+    from: "off"
+    to: "on"
+condition:
+  - condition: state
+    entity_id: binary_sensor.openclose_43
+    state: "off"
+action:
+  - service: input_boolean.turn_on
+    data: {}
+    entity_id: input_boolean.post_im_briefkasten
+  - service: notify.mobile_app_iphone_flo
+    data:
+      message: Post im Briefkasten!
+      data:
+        attachment:
+          url: http://10.1.1.130/snap.jpeg
+          content-type: jpg
+          hide-thumbnail: false
+  - service: counter.increment
+    data: {}
+    target:
+      entity_id: counter.post_im_briefkasten
+mode: single
+
+
+alias: Post im Briefkasten LEEREN
+description: ""
+trigger:
+  - platform: state
+    entity_id:
+      - binary_sensor.openclose_43
+    from: "on"
+    to: "off"
+    for:
+      hours: 0
+      minutes: 1
+      seconds: 0
+  - platform: state
+    entity_id:
+      - input_boolean.post_im_briefkasten
+    to: "off"
+condition: []
+action:
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 30
+      milliseconds: 0
+    enabled: false
+  - service: input_boolean.turn_off
+    data: {}
+    entity_id: input_boolean.post_im_briefkasten
+  - service: counter.reset
+    data: {}
+    target:
+      entity_id: counter.post_im_briefkasten
+mode: single

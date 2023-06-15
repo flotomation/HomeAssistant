@@ -1,0 +1,30 @@
+    type: custom:mushroom-template-card
+    primary: >
+      Seit {{ as_timestamp(state_attr('automation.post_im_briefkasten',
+      'last_triggered'), now() )  |timestamp_custom("%d.%m. um %H:%M Uhr", true,
+      now() ) }}
+    secondary: >-
+      {{ is_state("input_boolean.post_im_briefkasten", "off") | iif("Geleert",
+      "Post im Briefkasten") }}
+    icon: '  {{ is_state("input_boolean.post_im_briefkasten", "on") | iif("mdi:mailbox-up-outline", "mdi:mailbox-up") }}'
+    icon_color: >-
+      {{ is_state("input_boolean.post_im_briefkasten", "off") | iif("grey",
+      "yellow") }}
+    hold_action:
+      action: call-service
+      service: input_boolean.turn_off
+      service_data: {}
+      target:
+        entity_id: input_boolean.post_im_briefkasten
+    layout: vertical
+    tap_action:
+      action: more-info
+    entity: input_boolean.post_im_briefkasten
+    badge_icon: |-
+      {% if states.counter.post_im_briefkasten.state| float == 0%} 
+
+      {% else %} 
+      mdi:numeric-{{ states('counter.post_im_briefkasten')}}
+      {% endif %}
+    badge_color: red
+    multiline_secondary: false

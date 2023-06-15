@@ -1,0 +1,8 @@
+##helper
+
+input_boolean:
+  post_im_briefkasten:   
+    name: Post im Briefkasten    
+counter:
+  post_im_briefkasten:    
+    name: Post im Briefkasten    
