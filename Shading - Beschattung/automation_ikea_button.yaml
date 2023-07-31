@@ -1,0 +1,51 @@
+alias: Taster Jalousie Kinderzimmer
+description: ""
+trigger:
+  - platform: event
+    event_type: zha_event
+    event_data:
+      unique_id: 
+      command: up_open
+    id: hoch
+    enabled: true
+  - platform: event
+    event_type: zha_event
+    event_data:
+      unique_id: 
+      command: down_close
+    id: runter
+    enabled: true
+condition: []
+action:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id:
+              - hoch
+        sequence:
+          - service: cover.open_cover
+            data: {}
+            target:
+              entity_id:
+                - cover.jalousie_kinderzimmer_links_cover
+                - cover.jalousie_kinderzimmer_rechts_cover
+      - conditions:
+          - condition: trigger
+            id:
+              - runter
+        sequence:
+          - service: cover.close_cover
+            target:
+              entity_id: cover.jalousie_kinderzimmer_links_cover
+            data: {}
+          - service: cover.set_cover_position
+            data:
+              position: 15
+            target:
+              entity_id: cover.jalousie_kinderzimmer_rechts_cover
+          - wait_template: >-
+              {{ is_state_attr('cover.jalousie_kinderzimmer_links_cover',
+              'current_position', 0) }}
+            continue_on_timeout: false
+            enabled: false
+mode: restart

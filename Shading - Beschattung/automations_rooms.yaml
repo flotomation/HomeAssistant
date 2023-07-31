@@ -1,0 +1,111 @@
+alias: Badezimmer Sonnenschutz Jalousie
+description: ""
+trigger:
+  - platform: time_pattern
+    minutes: /15
+condition:
+  - condition: numeric_state
+    entity_id: cover.badezimmer_rollo
+    attribute: current_position
+    above: 50
+  - condition: numeric_state
+    entity_id: sensor.badezimmer_temperatur
+    above: 22
+  - condition: or
+    conditions:
+      - condition: state
+        entity_id: weather.openweathermap
+        state: sunny
+      - condition: state
+        entity_id: weather.openweathermap
+        state: partlycloudy
+      - condition: state
+        entity_id: weather.openweathermap
+        state: cloudy
+    alias: Wheather Condition
+  - condition: numeric_state
+    entity_id: sensor.sun_azimuth
+    below: 140
+    above: 70
+  - condition: template
+    value_template: >-
+      {{ not state_attr('automation.badezimmer_sonnenschutz_jalousie',
+      'last_triggered').day==now().day }}
+    alias: Run Only Once a Day
+  - condition: numeric_state
+    entity_id: sensor.xiaomi_lumi_sen_osten
+    above: 15000
+    alias: Lichtsensor Osten Sonnig 15000LUX
+action:
+  - service: cover.close_cover
+    target:
+      entity_id: cover.jalousie_badezimmer_cover
+    data: {}
+mode: single
+
+
+
+alias: Sonnenschutz Jalousie Kinderzimmer
+description: ""
+trigger:
+  - platform: time_pattern
+    minutes: /15
+condition:
+  - condition: numeric_state
+    entity_id: cover.buro_rollo
+    attribute: current_position
+    above: 49
+  - condition: numeric_state
+    entity_id: sensor.buro_temperatur
+    above: 22
+  - condition: or
+    conditions:
+      - condition: state
+        entity_id: weather.openweathermap
+        state: sunny
+      - condition: state
+        entity_id: weather.openweathermap
+        state: partlycloudy
+      - condition: state
+        entity_id: weather.openweathermap
+        state: cloudy
+  - condition: numeric_state
+    entity_id: sensor.sun_azimuth
+    below: 250
+    above: 130
+  - condition: numeric_state
+    entity_id: sensor.xiaomi_lumi_sen_sueden
+    above: 20000
+  - condition: and
+    conditions:
+      - condition: not
+        conditions:
+          - condition: state
+            entity_id: person.e
+            state: home
+        alias: E abwesend
+      - condition: template
+        value_template: >
+          {{ (state_attr('automation.taster_jalousie_kinderzimmer',
+          'last_triggered').day==now().day )  }}
+        alias: Sonnenschutz nicht manuell verwendet
+    alias: Taster und E zuhause
+action:
+  - service: cover.close_cover
+    target:
+      entity_id:
+        - cover.jalousie_kinderzimmer_links_cover
+    data: {}
+  - service: cover.set_cover_position
+    data:
+      position: 15
+    target:
+      entity_id:
+        - cover.jalousie_kinderzimmer_rechts_cover
+mode: single
+
+
+
+
+
+

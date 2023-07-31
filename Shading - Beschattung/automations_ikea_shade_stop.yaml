@@ -1,0 +1,34 @@
+alias: IKEA Rollos Stop Öffnen und Schließen
+description: ""
+trigger:
+  - platform: state
+    entity_id:
+      - cover.jalousie_badezimmer_cover
+      - cover.jalousie_schlafzimmer_mitte_cover
+      - cover.jalousie_kinderzimmer_links_cover
+      - cover.jalousie_kinderzimmer_rechts_cover
+      - cover.schlafzimmer_jalousie_cover
+    for:
+      hours: 0
+      minutes: 2
+      seconds: 0
+    to: closing
+  - platform: state
+    entity_id:
+      - cover.jalousie_badezimmer_cover
+      - cover.jalousie_schlafzimmer_mitte_cover
+      - cover.jalousie_kinderzimmer_links_cover
+      - cover.jalousie_kinderzimmer_rechts_cover
+      - cover.schlafzimmer_jalousie_cover
+    for:
+      hours: 0
+      minutes: 2
+      seconds: 0
+    to: opening
+condition: []
+action:
+  - service: cover.stop_cover
+    target:
+      entity_id: "{{trigger.entity_id}}"
+mode: queued
+max: 10

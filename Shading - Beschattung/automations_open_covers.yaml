@@ -1,0 +1,46 @@
+alias: Jalousie öffnen Osten Süden
+description: ""
+trigger:
+  - platform: numeric_state
+    entity_id: sensor.sun_azimuth
+    above: 150
+condition:
+  - condition: template
+    value_template: >-
+      {{ not state_attr('automation.jalousie_osten_offnen',
+      'last_triggered').day==now().day }}
+    alias: Run Only Once
+action:
+  - if:
+      - condition: numeric_state
+        entity_id: cover.jalousie_badezimmer_cover
+        attribute: current_position
+        below: 100
+    then:
+      - service: cover.open_cover
+        data: {}
+        target:
+          entity_id: cover.jalousie_badezimmer_cover
+  - if:
+      - condition: numeric_state
+        entity_id: cover.jalousie_schlafzimmer_mitte_cover
+        attribute: current_position
+        below: 100
+    then:
+      - service: cover.open_cover
+        data: {}
+        target:
+          entity_id:
+            - cover.jalousie_schlafzimmer_mitte_cover
+  - if:
+      - condition: numeric_state
+        entity_id: cover.schlafzimmer_jalousie_cover
+        attribute: current_position
+        below: 100
+    then:
+      - service: cover.open_cover
+        data: {}
+        target:
+          entity_id:
+            - cover.schlafzimmer_jalousie_cover
+mode: single
