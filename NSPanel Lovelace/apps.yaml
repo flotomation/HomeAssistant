@@ -1,0 +1,291 @@
+---
+
+
+nspanel-1:
+  module: nspanel-lovelace-ui
+  class: NsPanelLovelaceUIManager
+  config:
+    panelRecvTopic: "tele/nspanel/RESULT"
+    panelSendTopic: "cmnd/nspanel/CustomSend"
+    model: eu
+    sleepTracking: "alarm_control_panel.ha_alarm"
+    sleepTrackingZones: "armed_away"
+    sleepTimeout: 30
+    sleepBrightness:
+      - time: "7:00:00"
+        value: 10
+      - time: "20:00:00"
+        value: 1
+      - time: "22:00:00"
+        value: 0
+    locale: "de_DE"
+    screensaver:
+      defaultCard: navigate.cardGrid_diele
+      doubleTapToUnlock: true
+      statusIcon1:
+        entity: binary_sensor.alle_fenster
+        #icon: mdi:door-sliding
+        #icon: "ha-i: mdi:numeric-{{ expand('group.fenster') | selectattr('state', 'eq', 'on') | list | count }}"
+        #icon: "ha-i:{{ iif(is_state('alle_fenster', 'on'), mdi:flashlight, mdi:flashlight-off) }}"
+        icon: "ha:  {{ expand('group.fenster') | selectattr('state', 'eq', 'on') | list | count }}"
+        # icon: "ha-i: mdi:numeric-{{ expand('group.fenster') | selectattr('state', 'eq', 'on') | list | count }}-circle"
+        # icon: "ha:<I>mdi:numeric-{{ expand('group.fenster') | selectattr('state', 'eq', 'on') | list | count }}-circle</I>"
+        #icon: 'ha:<I>mdi:numeric-{{ expand("group.fenster") | selectattr("state", "eq", "on") | list | count }}-circle</I>'
+        #icon: 'ha:{{ iif(is_state('light.kitchen', 'on'), '<I>mdi:flashlight</I>', '<I>mdi:flashlight-off</I>') }}'
+        #icon: "ha:<I>mdi:numeric-{{ expand('group.fenster') | selectattr('state', 'eq', 'on') | list | count }}-circle<I>"
+
+        color:
+          "off": [0, 0, 0]
+          "on": [255, 0, 0]
+      entities:
+        - entity: weather.openweathermap
+
+        - entity: sensor.abfallnavi
+          value: >-
+            {% if 'Heute' in states('sensor.abfallnavi') %} 
+            'Heute'
+            {% elif 'Morgen' in states('sensor.abfallnavi')  %} 
+            'Morgen'
+            {% else %} 
+            {{(states("sensor.abfallnavi").split(" in")[1])}}
+            {% endif %}
+          name: >-
+            {% if 'Heute' in states('sensor.abfallnavi') %} 
+            'Muell'
+            {% elif 'Morgen' in states('sensor.abfallnavi')  %} 
+            'Muell'
+            {% else %} 
+            'Müll in'
+            {% endif %}
+
+          icon: mdi:beaker
+          color: >-
+            {% if 'Gelb' in states('sensor.abfallnavi') %} 
+            [255,255,0]
+            {% elif 'Blau' in states('sensor.abfallnavi')  %} 
+            [0,0,255] 
+            {% else %} 
+            [0,128,0] 
+            {% endif %}
+        - entity: input_boolean.post_im_briefkasten
+          name: Post
+          icon: mdi:mailbox
+          color: '{{iif(states("input_boolean.post_im_briefkasten")=="on", "[255,255,0]", "[50,50,50]")}}'
+          value: '{{iif(states("input_boolean.post_im_briefkasten")=="on", "Voll", "Leer")}}'
+
+        - entity: input_select.wasmachine_status
+          name: WM
+          color:
+            "in Betrieb": [255, 0, 0]
+            "Fertig": [0, 128, 0]
+            "Aus": [255, 255, 255]
+            "Standby": [255, 140, 0]
+          icon: mdi:washing-machine
+
+        - entity: input_select.trockner_status
+          name: Trockner
+          color:
+            "in Betrieb": [255, 0, 0]
+            "Fertig": [0, 128, 0]
+            "Aus": [255, 255, 255]
+            "Standby": [255, 255, 255]
+          icon: mdi:tumble-dryer
+
+    cards:
+      - type: cardGrid
+        title: Diele
+        key: cardGrid_diele
+        entities:
+          - entity: light.dimmable_light_31
+            icon: mdi:led-strip-variant
+          - entity: light.dimmable_light_33
+            icon: mdi:led-strip-variant
+          - entity: light.dimmable_light_34
+            icon: mdi:mirror
+          - entity: light.diele_deckenleuchte
+            icon: mdi:wall-sconce-flat
+          - entity: input_boolean.licht
+            icon: mdi:lightbulb-group
+      - type: cardEntities
+        title: Test 1
+        entities:
+          - entity: input_boolean.schlafenszeit
+            name: Schlafenszeit
+            icon: mdi:baby-face
+          - entity: vacuum.roborock_s5_max
+          - entity: sensor.mail_packages_in_transit_2
+            icon: mdi:truck-delivery
+            state_not: "0"
+
+      - type: cardEntities
+        title: Müll
+        entities:
+          - entity: sensor.abfallnavi
+            name: Müll
+            value: '{{ states("sensor.abfallnavi").split(" in")[0] }}'
+            #icon: 'ha:{% if "Gelb" in states("sensor.abfallnavi") %} mdi:mailbox-up-outline {% elif "Blau" in states("sensor.abfallnavi")  %} mdi:mailbox-up-outline {% else %} mdi:mailbox-up-outline {% endif %}'
+            #color: 'ha:{% if "Gelb" in states("sensor.abfallnavi") %} "[255,255,0]" {% elif "Blau" in states("sensor.abfallnavi")  %} "[0,0,255]" {% else %} "[0,128,0]" {% endif %}'
+            #            color: "ha:{% if 'Gelb' in states('sensor.abfallnavi') %} '[0,128,0]' {% elif 'Blau' in states('sensor.abfallnavi')  %} '[255,255,255]' {% else %} '[255,0,0]' {% endif %}"
+            icon: trash-can
+            color: >-
+              {% if 'Gelb' in states('sensor.abfallnavi') %} 
+              [255,255,0]
+              {% elif 'Blau' in states('sensor.abfallnavi')  %} 
+              [0,0,255] 
+              {% else %} 
+              [0,128,0] 
+              {% endif %}
+          - entity: sensor.abfallnavi
+            name: Tage
+            value: '{{ states("sensor.abfallnavi").split(" in")[1] }}'
+            icon: mdi:calendar
+            color: >-
+              {% if 'Gelb' in states('sensor.abfallnavi') %} 
+              [255,255,0]
+              {% elif 'Blau' in states('sensor.abfallnavi')  %} 
+              [0,0,255] 
+              {% else %} 
+              [0,128,0] 
+              {% endif %}
+
+          - entity: sensor.abfallnavi_nachbar
+            icon: mdi:account-group
+            name: Nachbar
+            color: '{{iif(states("sensor.abfallnavi_nachbar")=="Nachname", "[255,0,0]", "[255,255,255]")}}'
+            value: "Nachbarname"
+
+      - type: cardEntities
+        title: Haushalt
+        entities:
+          - entity: sensor.waschmaschine_string
+            icon: mdi:washing-machine
+          - entity: sensor.trockner_string
+            icon: mdi:tumble-dryer
+          - entity: sensor.dish_string
+            icon: mdi:dishwasher
+          - entity: input_boolean.post_im_briefkasten
+            icon: mdi:mailbox-up-outline
+            color: '{{iif(states("input_boolean.post_im_briefkasten")=="on", "[255,255,0]", "[255,255,255]")}}'
+
+      - type: cardEntities
+        title: Offene Fenster
+        entities:
+          - entity: binary_sensor.openclose_44
+            state: "on"
+          - entity: binary_sensor.openclose_19
+            state: "on"
+          - entity: binary_sensor.openclose_26
+            state: "on"
+          - entity: binary_sensor.openclose_18
+            state: "on"
+          - entity: binary_sensor.openclose_20
+            state: "on"
+          - entity: binary_sensor.openclose_23
+            state: "on"
+          - entity: binary_sensor.openclose_24
+            state: "on"
+          - entity: binary_sensor.openclose_22
+            state: "on"
+          - entity: binary_sensor.openclose_25
+            state: "on"
+
+      - type: cardMedia
+        entity: media_player.spotify
+        name: Spotify
+
+      - type: cardPower
+        title: Verbrauch
+        entities:
+          - entity: sensor.gesamt_verbauch_aktuell
+            icon: mdi:home-circle-outline
+
+          - entity: delete
+          - entity: sensor.solaranlage_ertrag_2
+            icon: mdi:solar-power-variant
+            color: [255, 255, 0]
+          - entity: sensor.solar_grid
+            icon: mdi:meter-electric
+          - entity: delete
+          - entity: sensor.auto_ladung_power
+            icon: mdi:car-electric
+          - entity: sensor.klima_verbrauch
+            icon: mdi:air-conditioner
+
+nspanel-2:
+  module: nspanel-lovelace-ui
+  class: NsPanelLovelaceUIManager
+  config:
+    panelRecvTopic: "tele/nspaneltuer/RESULT"
+    panelSendTopic: "cmnd/nspaneltuer/CustomSend"
+    model: eu
+    sleepTracking: "lock.wohnungsture_pro"
+    sleepTrackingZones: "locked"
+    sleepTimeout: 30
+    sleepBrightness:
+      - time: "7:00:00"
+        value: 10
+      - time: "20:00:00"
+        value: 1
+      - time: "22:00:00"
+        value: 0
+    locale: "de_DE"
+    screensaver:
+      defaultCard: navigate.cardGrid_diele
+      entities:
+        - entity: weather.openweathermap
+        - entity: cover.garagentor
+          name: Garage
+          color: '{{iif(states("cover.garagentor")=="open", "[255,255,0]", "[0,128,50]")}}'
+          value: '{{iif(states("cover.garagentor")=="open", "OFFEN", "Zu")}}'
+        - entity: input_boolean.post_im_briefkasten
+          name: Post
+          icon: mdi:mailbox
+          color: '{{iif(states("input_boolean.post_im_briefkasten")=="on", "[255,255,0]", "[50,50,50]")}}'
+          value: '{{iif(states("input_boolean.post_im_briefkasten")=="on", "Voll", "Leer")}}'
+        - entity: binary_sensor.auto_in_garage
+          name: Auto
+          icon: mdi:car
+          color: '{{iif(states("binary_sensor.auto_in_garage")=="on", "[255,255,0]", "[50,50,50]")}}'
+          value: '{{iif(states("binary_sensor.auto_in_garage")=="on", "Garage", "Leer")}}'
+        - entity: input_boolean.sonnenschutz
+          name: Sonne
+          icon: mdi:weather-sunny-alert
+          color: '{{iif(states("input_boolean.sonnenschutz")=="0", "[255,255,0]", "[50,50,50]")}}'
+          value: '{{iif(states("input_boolean.sonnenschutz")=="0", "Schutz", "aus")}}'
+    cards:
+      - type: cardGrid
+        title: Verlassen
+        key: cardGrid_diele
+        entities:
+          - entity: input_boolean.licht
+            icon: mdi:lightbulb-group
+            name: Licht aus
+          - entity: lock.keller_nuki
+            name: Kellertür
+          - entity: script.sonnenschutz_taster
+            name: Sonnenschutz
+            icon: mdi:weather-sunny-alert
+          - entity: script.garageauto
+            name: '{{iif(states("binary_sensor.auto_in_garage")=="on", "Garage+Auto", "Garage")}}'
+            icon: mdi:car-key
+
+
+          - entity: vacuum.roborock_s5_max
+            name: Sauger
+            color: '{{iif(states("vacuum.roborock_s5_max")=="docked", "[50,50,50]", "[255,255,0]")}}'
+          - entity: scene.rollos_hoch
+            icon: mdi:window-shutter-open
+
+      - type: cardGrid
+        title: Alles zusammen
+        key: cardGrid_zusammen
+        entities:
+          - entity: script.gehenallesmitauto
+            name: Alles + Auto
+            icon: mdi:car-select
+          - entity: script.gehenallesohneauto
+            name: Alles ohne Auto
+            icon: mdi:walk
+          - entity: script.kommen
+            name: Wieder da
+            icon: mdi:home
