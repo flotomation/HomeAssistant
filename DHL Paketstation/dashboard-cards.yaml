@@ -1,0 +1,73 @@
+#Dashboard Cards
+
+type: entities
+entities:
+  - entity: sensor.dhl_packstation_monday
+  - entity: sensor.dhl_packstation_tuesday
+  - entity: sensor.dhl_packstation_wednesday
+  - entity: sensor.dhl_packstation_thursday
+  - entity: sensor.dhl_packstation_friday
+  - entity: sensor.dhl_packstation_saturday
+  - entity: sensor.dhl_packstation_sunday
+title: Packstation Auslastung
+state_color: true
+
+
+type: custom:mushroom-template-card
+primary: Auslastung Packstation 
+secondary: "\n            {% if 'monday' ==  now().strftime('%A')|lower   %}  \n            {{states(\"sensor.dhl_packstation_monday\")}}\n            {% elif 'tuesday' ==  now().strftime('%A')|lower   %}  \n            {{states(\"sensor.dhl_packstation_tuesday\")}}\n            {% elif 'wednesday' ==  now().strftime('%A')|lower   %}  \n            {{states(\"sensor.dhl_packstation_wednesday\")}}\n            {% elif 'thursday' ==  now().strftime('%A')|lower   %}  \n            {{states(\"sensor.dhl_packstation_thursday\")}}\n            {% elif 'friday' ==  now().strftime('%A')|lower   %}  \n            {{states(\"sensor.dhl_packstation_friday\")}}   \n            {% elif 'saturday' ==  now().strftime('%A')|lower   %}  \n            {{states(\"sensor.dhl_packstation_saturday\")}}     \n            {% elif 'sunday' ==  now().strftime('%A')|lower   %}  \n            {{states(\"sensor.dhl_packstation_sunday\")}}    \_\n            {% endif %}"
+icon: mdi:mail
+tap_action:
+  action: more-info
+icon_color: |2-
+              {% if 'monday' ==  now().strftime('%A')|lower and is_state('sensor.dhl_packstation_monday', 'Sehr Hoch')   %}  
+              red
+              {% elif 'monday' ==  now().strftime('%A')|lower and is_state('sensor.dhl_packstation_monday', 'Hoch')   %}  
+              orange
+              {% elif 'monday' ==  now().strftime('%A')|lower and is_state('sensor.dhl_packstation_monday', 'Niedrig')   %}  
+              green
+              {% elif 'tuesday' ==  now().strftime('%A')|lower and is_state('sensor.dhl_packstation_tuesday', 'Sehr Hoch')   %}  
+              red
+              {% elif 'tuesday' ==  now().strftime('%A')|lower and is_state('sensor.dhl_packstation_tuesday', 'Hoch')   %}  
+              orange
+              {% elif 'tuesday' ==  now().strftime('%A')|lower and is_state('sensor.dhl_packstation_tuesday', 'Niedrig')   %}  
+              green
+              {% elif 'wednesday' ==  now().strftime('%A')|lower and is_state('sensor.dhl_packstation_wednesday', 'Sehr Hoch')   %}  
+              red
+              {% elif 'wednesday' ==  now().strftime('%A')|lower and is_state('sensor.dhl_packstation_wednesday', 'Hoch')   %}  
+              orange
+              {% elif 'wednesday' ==  now().strftime('%A')|lower and is_state('sensor.dhl_packstation_wednesday', 'Niedrig')   %}  
+              green
+   
+              {% elif 'thursday' ==  now().strftime('%A')|lower and is_state('sensor.dhl_packstation_thursday', 'Sehr Hoch')   %}  
+              red
+              {% elif 'thursday' ==  now().strftime('%A')|lower and is_state('sensor.dhl_packstation_thursday', 'Hoch')   %}  
+              orange
+              {% elif 'thursday' ==  now().strftime('%A')|lower and is_state('sensor.dhl_packstation_thursday', 'Niedrig')   %}  
+              green
+   
+              {% elif 'friday' ==  now().strftime('%A')|lower and is_state('sensor.dhl_packstation_friday', 'Sehr Hoch')   %}  
+              red
+              {% elif 'friday' ==  now().strftime('%A')|lower and is_state('sensor.dhl_packstation_friday', 'Hoch')   %}  
+              orange
+              {% elif 'friday' ==  now().strftime('%A')|lower and is_state('sensor.dhl_packstation_friday', 'Niedrig')   %}  
+              green
+   
+              {% elif 'saturday' ==  now().strftime('%A')|lower and is_state('sensor.dhl_packstation_saturday', 'Sehr Hoch')   %}  
+              red
+              {% elif 'saturday' ==  now().strftime('%A')|lower and is_state('sensor.dhl_packstation_saturday', 'Hoch')   %}  
+              orange
+              {% elif 'saturday' ==  now().strftime('%A')|lower and is_state('sensor.dhl_packstation_saturday', 'Niedrig')   %}  
+              green
+   
+              {% elif 'sunday' ==  now().strftime('%A')|lower and is_state('sensor.dhl_packstation_sunday', 'Sehr Hoch')   %}  
+              red
+              {% elif 'sunday' ==  now().strftime('%A')|lower and is_state('sensor.dhl_packstation_sunday', 'Hoch')   %}  
+              orange
+              {% elif 'sunday' ==  now().strftime('%A')|lower and is_state('sensor.dhl_packstation_sunday', 'Niedrig')   %}  
+              green
+              {% endif %}
+picture: ''
+fill_container: true
+layout: vertical
+multiline_secondary: true

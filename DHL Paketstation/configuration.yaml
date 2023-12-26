@@ -1,0 +1,90 @@
+rest:
+  - resource: 'https://api.dhl.com/location-finder/v1/locations/888-location-id'
+    scan_interval: 240
+    headers:
+      DHL-API-Key: your-api-key
+    sensor:
+      - name: "DHL Packstation Monday"
+        value_template: >-
+            {% if value_json.averageCapacityDayOfWeek[0].capacity == 'very-low'  %}  
+            Sehr Hoch
+            {% elif value_json.averageCapacityDayOfWeek[0].capacity == 'low'   %}  
+            Hoch
+            {% elif value_json.averageCapacityDayOfWeek[0].capacity == 'high'   %}   
+            Niedrig
+            {% else %}  
+            Unbekannt    
+            {% endif %}
+        unique_id: dhl_packstation_penny_monday
+      - name: "DHL Packstation Tuesday"
+        value_template: >-
+            {% if value_json.averageCapacityDayOfWeek[1].capacity == 'very-low'  %}  
+            Sehr Hoch
+            {% elif value_json.averageCapacityDayOfWeek[1].capacity == 'low'   %}  
+            Hoch
+            {% elif value_json.averageCapacityDayOfWeek[1].capacity == 'high'   %}   
+            Niedrig
+            {% else %}  
+            Unbekannt    
+            {% endif %}
+        unique_id: dhl_packstation_penny_tuesday
+      - name: "DHL Packstation Wednesday"
+        value_template: >-
+            {% if value_json.averageCapacityDayOfWeek[2].capacity == 'very-low'  %}  
+            Sehr Hoch
+            {% elif value_json.averageCapacityDayOfWeek[2].capacity == 'low'   %}  
+            Hoch
+            {% elif value_json.averageCapacityDayOfWeek[2].capacity == 'high'   %}   
+            Niedrig
+            {% else %}  
+            Unbekannt    
+            {% endif %}
+        unique_id: dhl_packstation_penny_wednesday
+      - name: "DHL Packstation Thursday"
+        value_template: >-
+            {% if value_json.averageCapacityDayOfWeek[3].capacity == 'very-low'  %}  
+            Sehr Hoch
+            {% elif value_json.averageCapacityDayOfWeek[3].capacity == 'low'   %}  
+            Hoch
+            {% elif value_json.averageCapacityDayOfWeek[3].capacity == 'high'   %}   
+            Niedrig
+            {% else %}  
+            Unbekannt    
+            {% endif %}
+        unique_id: dhl_packstation_penny_thursday
+      - name: "DHL Packstation Friday"
+        unique_id: dhl_packstation_penny_friday
+        value_template: >-
+            {% if value_json.averageCapacityDayOfWeek[4].capacity == 'very-low'  %}  
+            Sehr Hoch
+            {% elif value_json.averageCapacityDayOfWeek[4].capacity == 'low'   %}  
+            Hoch
+            {% elif value_json.averageCapacityDayOfWeek[4].capacity == 'high'   %}   
+            Niedrig
+            {% else %}  
+            Unbekannt    
+            {% endif %}
+      - name: "DHL Packstation Saturday"
+        value_template: >-
+            {% if value_json.averageCapacityDayOfWeek[5].capacity == 'very-low'  %}  
+            Sehr Hoch
+            {% elif value_json.averageCapacityDayOfWeek[5].capacity == 'low'   %}  
+            Hoch
+            {% elif value_json.averageCapacityDayOfWeek[5].capacity == 'high'   %}   
+            Niedrig
+            {% else %}  
+            Unbekannt    
+            {% endif %}
+        unique_id: dhl_packstation_penny_saturday
+      - name: "DHL Packstation Sunday"
+        value_template: >-
+            {% if value_json.averageCapacityDayOfWeek[6].capacity == 'very-low'  %}  
+            Sehr Hoch
+            {% elif value_json.averageCapacityDayOfWeek[6].capacity == 'low'   %}  
+            Hoch
+            {% elif value_json.averageCapacityDayOfWeek[6].capacity == 'high'   %}   
+            Niedrig
+            {% else %}  
+            Unbekannt    
+            {% endif %}
+        unique_id: dhl_packstation_penny_sunday
