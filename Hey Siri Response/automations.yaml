@@ -1,0 +1,88 @@
+alias: Guest Mode Siri Feedback Response
+description: "TTS via Piper to Homepods and Wait for Respond via Helper Button"
+trigger:
+  - platform: numeric_state
+    entity_id:
+      - sensor.wifi_guest
+    for:
+      hours: 0
+      minutes: 15
+      seconds: 0
+    above: 0
+condition:
+  - condition: state
+    entity_id: input_boolean.schlafenszeit
+    state: "off"
+  - condition: numeric_state
+    entity_id: zone.home
+    above: 0
+  - condition: state
+    entity_id: input_boolean.visit
+    state: "off"
+action:
+  - if:
+      - condition: state
+        entity_id: binary_sensor.presence_sensor_fp2_bedroom
+        state: "on"
+    then:
+      - service: tts.speak
+        target:
+          entity_id: tts.piper
+        data:
+          media_player_entity_id: media_player.homepod_bedroom
+          message: It looks like we have visitors, shall I activate the visitor mode??
+  - if:
+      - condition: state
+        entity_id: binary_sensor.presence_sensor_fp2_livingroom
+        state: "on"
+    then:
+      - service: tts.speak
+        data:
+          media_player_entity_id: media_player.homepod_livingroom
+          message: It looks like we have visitors, shall I activate the visitor mode??
+  - wait_for_trigger:
+      - platform: state
+        entity_id:
+          - input_button.hey_siri_yes
+        to: null
+        id: respond
+    timeout:
+      hours: 0
+      minutes: 1
+      seconds: 0
+      milliseconds: 0
+  - if:
+    alias: Response and Automation run 
+      - condition: template
+        value_template: >
+          {{ (now() - states('input_button.hey_siri_yes')|as_datetime).seconds <
+          90  and (now() - state_attr('automation.feedback_gast',
+          'last_triggered')).seconds < 90 }}
+    then:
+      - if:
+          - condition: state
+            entity_id: binary_sensor.presence_sensor_fp2_bedroom
+            state: "on"
+        then:
+          - service: tts.speak
+            target:
+             entity_id: tts.piper      
+            data:
+              media_player_entity_id: media_player.homepod_bedroom
+              message: OK I set the visitor mode
+      - if:
+          - condition: state
+            entity_id: binary_sensor.presence_sensor_fp2_livingroom
+            state: "on"
+        then:
+          - service: tts.speak
+            target:
+             entity_id: tts.piper      
+            data:
+              media_player_entity_id: media_player.homepod_livingroom
+              message: OK I set the visitor mode
+      - service: input_boolean.turn_on
+        target:
+          entity_id: input_boolean.visit
+        data: {}
+mode: restart
